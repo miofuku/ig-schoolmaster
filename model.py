@@ -1,129 +1,40 @@
-# Import the required libraries
 import os
 import requests
-import pandas as pd
-import matplotlib.pyplot as plt
 import math
 import tiktoken
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.optim.lr_scheduler import LambdaLR
+from torch.nn import functional as F
+
+# Hyperparameters
+batch_size = 4  # How many batches per training step
+context_length = 16  # Length of the token chunk each batch
+d_model = 64  # The size of our model token embeddings
+num_blocks = 8  # Number of transformer blocks
+num_heads = 4  # Number of heads in Multi-head attention
+learning_rate = 1e-3  # 0.001
+dropout = 0.1  # Dropout rate
+max_iters = 5000  # Total of training iterations <- Change this to smaller number for testing
+eval_interval = 50  # How often to evaluate
+eval_iters = 20  # Number of iterations to average for evaluation
+device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Use GPU if it's available.
+TORCH_SEED = 1337
+torch.manual_seed(TORCH_SEED)
 
 # Load training data
 with open('data/hello-algo-python.txt', 'r', encoding='utf-8') as f:
     text = f.read()
 
-# Optimized hyperparameters and model structure
-batch_size = 32  # How many batches per training step
-context_length = 64  # Length of the token chunk each batch
-d_model = 256  # The size of our model token embeddings
-num_layers = 6  # Number of transformer blocks
-num_heads = 8  # Number of heads in Multi-head attention
-learning_rate = 5e-4  # 0.001
-dropout = 0.2  # Dropout rate
-max_iters = 10000  # Total of training iterations <- Change this to smaller number for testing
-eval_interval = 100  # How often to evaluate
-eval_iters = 20  # Number of iterations to average for evaluation
-warmup_steps = 1000  # Learning rate warmup
-weight_decay = 0.01  # Weight decay 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Use GPU if it's available.
-
-# Set random seed
-TORCH_SEED = 1337
-torch.manual_seed(TORCH_SEED)
-
-# Tokenize the text
+# Using TikToken (Same as GPT3) to tokenize the source text
 encoding = tiktoken.get_encoding("cl100k_base")
 tokenized_text = encoding.encode(text)
 max_token_value = max(tokenized_text) + 1  # the maximum value of the tokenized numbers
 tokenized_text = torch.tensor(tokenized_text, dtype=torch.long, device=device)  # put tokenized text into tensor
 
-# Split data into training and validation sets
+# Split train and validation
 split_idx = int(len(tokenized_text) * 0.9)
 train_data = tokenized_text[:split_idx]
 val_data = tokenized_text[split_idx:]
-
-class TransformerModel(nn.Module):
-    def __init__(self):
-        super(TransformerModel, self).__init__()
-        self.token_embedding = nn.Embedding(max_token_value + 1, d_model)
-        self.position_encoding = self._generate_position_encoding()
-        encoder_layer = nn.TransformerEncoderLayer(d_model, num_heads, d_model * 4, dropout, batch_first=True)
-        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers)
-        self.fc_out = nn.Linear(d_model, max_token_value + 1)
-
-    def forward(self, x):
-        x = self.token_embedding(x) + self.position_encoding[:x.size(1), :]
-        x = self.transformer_encoder(x)
-        x = self.fc_out(x)
-        return x
-
-    def _generate_position_encoding(self):
-        position_encoding = torch.zeros(context_length, d_model, device=device)
-        position = torch.arange(0, context_length, dtype=torch.float).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
-        position_encoding[:, 0::2] = torch.sin(position * div_term)
-        position_encoding[:, 1::2] = torch.cos(position * div_term)
-        return position_encoding.unsqueeze(0)
-    
-# Learning rate scheduler with warmup
-def get_lr_scheduler(optimizer):
-    def lr_lambda(step):
-        if step < warmup_steps:
-            return float(step) / float(max(1, warmup_steps))
-        return 0.1 ** (step // 1000)
-    return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
-
-# Initialize the model, loss function, and optimizer
-model = TransformerModel().to(device)
-loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=0.01)
-scheduler = get_lr_scheduler(optimizer)
-
-# Training loop with gradient clipping and early stopping
-best_val_loss = float('inf')
-patience = 5
-patience_counter = 0
-
-for iter in range(max_iters):
-    model.train()
-    x_batch, y_batch = get_batch(train_data)
-    optimizer.zero_grad()
-    output = model(x_batch)
-    loss = loss_fn(output.view(-1, max_token_value + 1), y_batch.view(-1))
-    loss.backward()
-    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-    optimizer.step()
-    scheduler.step()
-
-    if iter % eval_interval == 0:
-        model.eval()
-        with torch.no_grad():
-            val_loss = sum(loss_fn(model(get_batch(val_data)[0]).view(-1, max_token_value + 1), get_batch(val_data)[1].view(-1)).item() for _ in range(eval_iters)) / eval_iters
-            print(f'Step: {iter}, Validation Loss: {val_loss:.3f}')
-            
-            if val_loss < best_val_loss:
-                best_val_loss = val_loss
-                patience_counter = 0
-                torch.save(model.state_dict(), 'best_model.pt')
-            else:
-                patience_counter += 1
-                
-            if patience_counter >= patience:
-                print("Early stopping")
-                break
-
-# Load best model for final evaluation
-model.load_state_dict(torch.load('best_model.pt'))
-model.eval()
-
-
-
-
-
-
-
 
 
 # Define Feed Forward Network
