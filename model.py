@@ -1,5 +1,3 @@
-import os
-import requests
 import math
 import tiktoken
 import torch
@@ -7,17 +5,19 @@ import torch.nn as nn
 from torch.nn import functional as F
 
 # Hyperparameters
-batch_size = 4  # How many batches per training step
-context_length = 16  # Length of the token chunk each batch
-d_model = 64  # The size of our model token embeddings
-num_blocks = 8  # Number of transformer blocks
-num_heads = 4  # Number of heads in Multi-head attention
-learning_rate = 1e-3  # 0.001
-dropout = 0.1  # Dropout rate
+batch_size = 16  # How many batches per training step
+context_length = 64  # Length of the token chunk each batch
+d_model = 128  # The size of our model token embeddings
+num_blocks = 12  # Number of transformer blocks
+num_heads = 8  # Number of heads in Multi-head attention
+learning_rate = 5e-4  # 0.001
+dropout = 0.2  # Dropout rate
 max_iters = 5000  # Total of training iterations <- Change this to smaller number for testing
 eval_interval = 50  # How often to evaluate
 eval_iters = 20  # Number of iterations to average for evaluation
 device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Use GPU if it's available.
+
+# Set Pytorch seed
 TORCH_SEED = 1337
 torch.manual_seed(TORCH_SEED)
 
