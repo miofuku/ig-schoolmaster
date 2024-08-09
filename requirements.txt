@@ -3,6 +3,8 @@ torch==2.4.0
 numpy==2.0
 pandas==2.2.2
 tiktoken==0.5.1
+transformers==4.44.0
 
 # Additional machine learning and data processing libraries
 matplotlib==3.9.0
+json==1.6.3
