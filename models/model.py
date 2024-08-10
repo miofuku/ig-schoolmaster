@@ -1,18 +1,17 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
-from transformers import GPTJForCausalLM, GPTJTokenizer, AdamW, get_linear_schedule_with_warmup
+from transformers import GPT2LMHeadModel, GPT2Tokenizer, AdamW, get_linear_schedule_with_warmup
 from tqdm import tqdm
 import pandas as pd
+from config import DEVICE
 
-# 设置设备
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# 加载预训练的GPT-J模型和分词器
-model = GPTJForCausalLM.from_pretrained("EleutherAI/gpt-j-6B")
-tokenizer = GPTJTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
+# 加载预训练的模型和分词器
+model_name = "distilgpt2"
+tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+model = GPT2LMHeadModel.from_pretrained(model_name)
 
 # 将模型移动到GPU（如果可用）
-model.to(device)
+model.to(DEVICE)
 
 # 定义自定义数据集
 class CustomDataset(Dataset):
@@ -55,8 +54,8 @@ for epoch in range(num_epochs):
     model.train()
     total_loss = 0
     for batch in tqdm(train_loader, desc=f"Epoch {epoch + 1}"):
-        input_ids = batch['input_ids'].to(device)
-        attention_mask = batch['attention_mask'].to(device)
+        input_ids = batch['input_ids'].to(DEVICE)
+        attention_mask = batch['attention_mask'].to(DEVICE)
         
         outputs = model(input_ids, attention_mask=attention_mask, labels=input_ids)
         loss = outputs.loss
@@ -76,8 +75,8 @@ model.save_pretrained("path/to/save/finetuned_model")
 tokenizer.save_pretrained("path/to/save/finetuned_model")
 
 # 加载微调后的模型（用于推理）
-finetuned_model = GPTJForCausalLM.from_pretrained("path/to/save/finetuned_model")
-finetuned_tokenizer = GPTJTokenizer.from_pretrained("path/to/save/finetuned_model")
+finetuned_model = GPT2LMHeadModel.from_pretrained("path/to/save/finetuned_model")
+finetuned_tokenizer = GPT2Tokenizer.from_pretrained("path/to/save/finetuned_model")
 
 # 示例推理
 input_text = "What is the capital of France?"
