@@ -9,3 +9,6 @@ tqdm==4.66.5
 # Additional machine learning and data processing libraries
 matplotlib==3.9.0
 json==1.6.3
+
+# Knowledge graph
+rdflib==7.0.0
