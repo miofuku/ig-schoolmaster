@@ -1,5 +1,4 @@
 from collections import defaultdict
-import torch
 from utils.model_utils import fine_tune_model
 
 class PersonalizedTutor:

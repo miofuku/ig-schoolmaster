@@ -7,3 +7,6 @@ transformers==4.44.0
 # Additional machine learning and data processing libraries
 matplotlib==3.9.0
 json==1.6.3
+
+# Knowledge graph
+networkx==3.3
