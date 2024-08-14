@@ -37,7 +37,12 @@ The Ignorant Schoolmaster is an AI-powered virtual teaching assistant inspired b
    - Create a Q&A dataset in `data/course_qa.json`
    - Prepare your knowledge graph in `data/knowledge_graph.json`
 
-4. Run the application:
+4. Train the model with provided data:
+   ```
+   python train.py
+   ```
+
+4. Run the application with trained model:
    ```
    python app.py
    ```
@@ -45,33 +50,6 @@ The Ignorant Schoolmaster is an AI-powered virtual teaching assistant inspired b
 ## Usage
 
 After starting the application, you can interact with the virtual teacher by typing your questions or comments. The system will provide personalized responses and additional information based on your learning progress and style.
-
-Example interaction:
-
-```
-Student: Can you explain the concept of recursion in programming?
-
-Virtual Teacher: Certainly! Recursion in programming is a technique where a function calls itself to solve a problem by breaking it down into smaller, similar sub-problems. It's like a Russian nesting doll, where each doll contains a smaller version of itself.
-
-Let's look at a simple example:
-
-def factorial(n):
-    if n == 0 or n == 1:
-        return 1
-    else:
-        return n * factorial(n-1)
-
-In this factorial function, we're using recursion to calculate the factorial of a number. The function calls itself with a smaller number until it reaches the base case (0 or 1).
-
-Additional Information:
-Related concepts you might want to explore:
-- Base case
-- Call stack
-- Recursive data structures
-  Prerequisites: Functions, Conditional statements
-
-Was this response helpful? (y/n): 
-```
 
 ## Contributing
 
