@@ -10,3 +10,4 @@ json==1.6.3
 
 # Knowledge graph
 networkx==3.3
+nltk==3.8.0
