@@ -36,11 +36,7 @@ The Ignorant Schoolmaster is an AI-powered virtual teaching assistant inspired b
    - Add your course content to `data/course_content.txt`
    - Create a Q&A dataset in `data/course_qa.json`
    - Prepare your knowledge graph in `data/knowledge_graph.json`
-
-4. Train the model with provided data:
-   ```
-   python train.py
-   ```
+   - Add addtional content in `data/supplementary_data.txt`
 
 4. Run the application with trained model:
    ```
