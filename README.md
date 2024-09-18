@@ -1,29 +1,29 @@
 # The Ignorant Schoolmaster
 
-The Ignorant Schoolmaster is an AI-powered virtual teaching assistant inspired by [Jacques Rancière](https://en.wikipedia.org/wiki/Jacques_Ranci%C3%A8re)'s book of the same name. This project aims to create a personalized learning experience by combining the power of large language models with knowledge graphs and adaptive learning techniques.
+The Ignorant Schoolmaster AI is an innovative educational platform inspired by Jacques Rancière's philosophy of intellectual emancipation. Unlike traditional AI tutors, this system aims to empower students in their self-directed learning journey, promoting autonomy, critical thinking, and peer collaboration.
 
-## Features
+## Core Principles
 
-- GPT-Neo-based language model for natural conversations
-- Knowledge graph integration for concept relationships
-- Personalized tutoring based on individual learning pace and style
-- Continuous learning and adaptation through user feedback
-- Additional information and learning path suggestions
+- Promote student autonomy and self-discovery
+- Emphasize equality of intelligence among all learners
+- Focus on will and attention rather than knowledge transfer
+- Encourage peer learning and teaching
+- Position AI as a tool for emancipation, not as a knowledgeable master
+
+## Key Features
+
+- **Universal Book Repository**: A diverse digital library for free exploration
+- **Question Generator**: AI-powered tool for thought-provoking inquiries
+- **Peer Collaboration Platform**: Facilitates student-to-student learning
+- **Progress Tracker**: For self-set goals and reflection
+- **AI Facilitator**: Minimal guidance to maintain engagement
+- **Open-Ended Knowledge Map**: Student-generated concept connections
 
 ## Getting Started
 
-### Prerequisites
-
-- Python 3.7+
-- PyTorch
-- Transformers
-- NetworkX
-
-### Installation
-
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/ig-schoolmaster.git
+   git clone https://github.com/miofuku/ig-schoolmaster.git
    cd ig-schoolmaster
    ```
 
@@ -32,20 +32,20 @@ The Ignorant Schoolmaster is an AI-powered virtual teaching assistant inspired b
    pip install -r requirements.txt
    ```
 
-3. Prepare your data:
-   - Add your course content to `data/course_content.txt`
-   - Create a Q&A dataset in `data/course_qa.json`
-   - Prepare your knowledge graph in `data/knowledge_graph.json`
-   - Add addtional content in `data/supplementary_data.txt`
-
-4. Run the application with trained model:
+3. Run the application with trained model:
    ```
    python app.py
    ```
 
-## Usage
+## Project Structure
 
-After starting the application, you can interact with the virtual teacher by typing your questions or comments. The system will provide personalized responses and additional information based on your learning progress and style.
+- `app.py`: Main application entry point
+- `universal_book/`: Digital library management
+- `question_generator/`: AI-powered question generation tools
+- `peer_platform/`: Peer collaboration and interaction features
+- `progress_tracker/`: Self-assessment and goal-setting tools
+- `ai_facilitator/`: Minimal AI guidance implementation
+- `knowledge_map/`: Open-ended concept mapping tools
 
 ## Contributing
 
@@ -53,4 +53,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the `LICENSE.md` file for details.
+
+## Acknowledgments
+
+- Jacques Rancière for his groundbreaking work "The Ignorant Schoolmaster"
+- All contributors and supporters of self-directed learning initiatives
