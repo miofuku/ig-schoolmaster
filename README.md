@@ -27,15 +27,23 @@ The Ignorant Schoolmaster AI is an innovative educational platform inspired by J
    cd ig-schoolmaster
    ```
 
-2. Install the required packages:
+2. Create a virtual environment and activate it:
+   ```
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   ```
+
+3. Install the required packages:
    ```
    pip install -r requirements.txt
    ```
 
-3. Run the application with trained model:
+4. Run the application with trained model:
    ```
-   python app.py
+   python3 app.py
    ```
+   
+5. Open a web browser and navigate to `http://localhost:5000`
 
 ## Project Structure
 
@@ -46,6 +54,25 @@ The Ignorant Schoolmaster AI is an innovative educational platform inspired by J
 - `progress_tracker/`: Self-assessment and goal-setting tools
 - `ai_facilitator/`: Minimal AI guidance implementation
 - `knowledge_map/`: Open-ended concept mapping tools
+
+## API Endpoints
+
+* `/explore`: GET request to explore random books
+* `/question`: POST request to generate a question on a given topic
+* `/peer_teach`: POST request to submit a peer teaching lesson
+* `/track_progress`: POST request to update progress on a goal
+* `/facilitate`: POST request to get a facilitation prompt
+* `/map_knowledge`: POST request to create connections between concepts
+
+## Future Enhancements
+
+* Implement user authentication and profiles
+* Create a more sophisticated Universal Book Repository with a larger, diverse collection of texts
+* Enhance the Question Generator with NLP techniques for more context-aware questions
+* Develop a full-fledged Peer Collaboration Platform with real-time interaction features
+* Expand the Progress Tracker with detailed analytics and visualizations
+* Improve the AI Facilitator with more advanced, adaptive prompting techniques
+* Create a visual interface for the Knowledge Mapper
 
 ## Contributing
 
