@@ -199,3 +199,72 @@ footer {
     margin-bottom: 5px;
     border-radius: 3px;
 }
+
+.knowledge-map-container {
+    margin-top: 2rem;
+}
+
+#create-map-form {
+    margin-bottom: 1rem;
+}
+
+#create-map-form input[type="text"] {
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+#map-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#map-list li {
+    margin-bottom: 0.5rem;
+}
+
+#map-list a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+#map-list a:hover {
+    text-decoration: underline;
+}
+
+#map-container {
+    margin-top: 2rem;
+}
+
+#map-canvas {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#map-controls {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+#map-controls input[type="text"] {
+    flex-grow: 1;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+#map-controls button {
+    padding: 0.5rem 1rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#map-controls button:hover {
+    background-color: #2980b9;
+}

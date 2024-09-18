@@ -150,11 +150,90 @@ def reflect_on_goal(goal_index):
         return jsonify({'error': 'Goal not found'}), 404
 
 
-@app.route('/map_knowledge', methods=['POST'])
-def map_knowledge():
-    concepts = request.json['concepts']
-    knowledge_map = knowledge_mapper.create_map(concepts)
-    return jsonify({'map': knowledge_map})
+@app.route('/knowledge_maps')
+def knowledge_maps():
+    user_id = session.get('user_id', 'anonymous')
+    maps = knowledge_mapper.get_user_maps(user_id)
+    return render_template('knowledge_maps.html', maps=maps)
+
+
+@app.route('/create_map', methods=['POST'])
+def create_map():
+    user_id = session.get('user_id', 'anonymous')
+    title = request.json['title']
+    map_id = knowledge_mapper.create_map(user_id, title)
+    return jsonify({'map_id': map_id})
+
+
+@app.route('/get_map/<int:map_id>')
+def get_map(map_id):
+    user_id = session.get('user_id', 'anonymous')
+    map_data = knowledge_mapper.get_map(user_id, map_id)
+    if map_data:
+        return jsonify(map_data)
+    return jsonify({'error': 'Map not found'}), 404
+
+
+@app.route('/add_node', methods=['POST'])
+def add_node():
+    user_id = session.get('user_id', 'anonymous')
+    map_id = request.json['map_id']
+    label = request.json['label']
+    x = request.json['x']
+    y = request.json['y']
+    node_id = knowledge_mapper.add_node(user_id, map_id, label, x, y)
+    return jsonify({'node_id': node_id})
+
+
+@app.route('/add_edge', methods=['POST'])
+def add_edge():
+    user_id = session.get('user_id', 'anonymous')
+    map_id = request.json['map_id']
+    source_id = request.json['source_id']
+    target_id = request.json['target_id']
+    label = request.json.get('label', '')
+    edge_id = knowledge_mapper.add_edge(user_id, map_id, source_id, target_id, label)
+    return jsonify({'edge_id': edge_id})
+
+
+@app.route('/update_node', methods=['POST'])
+def update_node():
+    user_id = session.get('user_id', 'anonymous')
+    map_id = request.json['map_id']
+    node_id = request.json['node_id']
+    label = request.json.get('label')
+    x = request.json.get('x')
+    y = request.json.get('y')
+    success = knowledge_mapper.update_node(user_id, map_id, node_id, label, x, y)
+    return jsonify({'success': success})
+
+
+@app.route('/update_edge', methods=['POST'])
+def update_edge():
+    user_id = session.get('user_id', 'anonymous')
+    map_id = request.json['map_id']
+    edge_id = request.json['edge_id']
+    label = request.json['label']
+    success = knowledge_mapper.update_edge(user_id, map_id, edge_id, label)
+    return jsonify({'success': success})
+
+
+@app.route('/delete_node', methods=['POST'])
+def delete_node():
+    user_id = session.get('user_id', 'anonymous')
+    map_id = request.json['map_id']
+    node_id = request.json['node_id']
+    success = knowledge_mapper.delete_node(user_id, map_id, node_id)
+    return jsonify({'success': success})
+
+
+@app.route('/delete_edge', methods=['POST'])
+def delete_edge():
+    user_id = session.get('user_id', 'anonymous')
+    map_id = request.json['map_id']
+    edge_id = request.json['edge_id']
+    success = knowledge_mapper.delete_edge(user_id, map_id, edge_id)
+    return jsonify({'success': success})
 
 
 if __name__ == '__main__':
