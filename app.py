@@ -36,9 +36,22 @@ def search():
 
 @app.route('/question', methods=['POST'])
 def get_question():
-    topic = request.json['topic']
-    question = question_gen.generate_question(topic)
-    return jsonify({'question': question})
+    data = request.json
+    book = None
+    if 'book_id' in data:
+        book = book_repo.get_book_by_id(data['book_id'])
+    elif 'topic' in data:
+        book = book_repo.get_book_by_title(data['topic'])
+
+    if not book:
+        return jsonify({'error': 'Book not found'}), 404
+
+    try:
+        questions = question_gen.generate_multiple_questions(book, n=3)
+        return jsonify({'questions': questions})
+    except Exception as e:
+        app.logger.error(f"Error generating questions: {str(e)}")
+        return jsonify({'error': 'An error occurred while generating questions'}), 500
 
 
 @app.route('/peer_teach', methods=['POST'])

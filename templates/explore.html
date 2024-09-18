@@ -9,27 +9,30 @@
             <div class="book-item">
                 <h3>{{ book.title }}</h3>
                 <p>By {{ book.author }}</p>
-                <button onclick="generateQuestion('{{ book.title }}')">Generate Question</button>
+                <p>{{ book.summary }}</p>
+                <p>Tags: {{ book.tags|join(', ') }}</p>
+                <button onclick="generateQuestions('{{ book.id }}')">Generate Questions</button>
+                <div class="questions-container" id="questions-{{ book.id }}" style="display: none;"></div>
             </div>
         {% endfor %}
     </div>
-    <div id="question-container" style="display: none;">
-        <h3>Thought-Provoking Question:</h3>
-        <p id="generated-question"></p>
-    </div>
     <script>
-        function generateQuestion(bookTitle) {
+        function generateQuestions(bookId) {
             fetch('/question', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({topic: bookTitle}),
+                body: JSON.stringify({book_id: bookId}),
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('generated-question').textContent = data.question;
-                document.getElementById('question-container').style.display = 'block';
+                const questionsContainer = document.getElementById(`questions-${bookId}`);
+                questionsContainer.innerHTML = '<h4>Thought-Provoking Questions:</h4>';
+                data.questions.forEach(question => {
+                    questionsContainer.innerHTML += `<p>${question}</p>`;
+                });
+                questionsContainer.style.display = 'block';
             });
         }
     </script>

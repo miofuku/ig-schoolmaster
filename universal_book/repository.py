@@ -19,4 +19,11 @@ class UniversalBookRepository:
         return [book for book in self.books if query.lower() in book['title'].lower() or query.lower() in book['author'].lower()]
 
     def get_book_by_id(self, book_id):
+        try:
+            book_id = int(book_id)
+        except ValueError:
+            return None
         return next((book for book in self.books if book['id'] == book_id), None)
+
+    def get_book_by_title(self, title):
+        return next((book for book in self.books if book['title'].lower() == title.lower()), None)
