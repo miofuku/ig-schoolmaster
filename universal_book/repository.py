@@ -1,5 +1,6 @@
 import random
 
+
 class UniversalBookRepository:
     def __init__(self):
         self.books = [

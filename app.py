@@ -15,14 +15,17 @@ progress_tracker = ProgressTracker()
 ai_facilitator = AIFacilitator()
 knowledge_mapper = KnowledgeMapper()
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/explore')
 def explore():
     books = book_repo.get_random_books(5)
     return render_template('explore.html', books=books)
+
 
 @app.route('/question', methods=['POST'])
 def get_question():
@@ -30,11 +33,13 @@ def get_question():
     question = question_gen.generate_question(topic)
     return jsonify({'question': question})
 
+
 @app.route('/peer_teach', methods=['POST'])
 def peer_teach():
     lesson = request.json['lesson']
     peer_platform.submit_lesson(lesson)
     return jsonify({'status': 'success'})
+
 
 @app.route('/track_progress', methods=['POST'])
 def track_progress():
@@ -42,17 +47,20 @@ def track_progress():
     progress = progress_tracker.update_progress(goal)
     return jsonify({'progress': progress})
 
+
 @app.route('/facilitate', methods=['POST'])
 def facilitate():
     context = request.json['context']
     prompt = ai_facilitator.generate_prompt(context)
     return jsonify({'prompt': prompt})
 
+
 @app.route('/map_knowledge', methods=['POST'])
 def map_knowledge():
     concepts = request.json['concepts']
     knowledge_map = knowledge_mapper.create_map(concepts)
     return jsonify({'map': knowledge_map})
+
 
 if __name__ == '__main__':
     app.run(debug=True)

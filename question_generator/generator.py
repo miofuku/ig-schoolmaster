@@ -1,5 +1,6 @@
 import random
 
+
 class QuestionGenerator:
     def __init__(self):
         self.question_templates = [

@@ -1,5 +1,6 @@
 import random
 
+
 class AIFacilitator:
     def __init__(self):
         self.prompts = [
