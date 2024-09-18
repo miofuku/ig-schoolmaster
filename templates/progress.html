@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Your Progress - Ignorant Schoolmaster AI{% endblock %}
+
+{% block content %}
+    <h2>Your Learning Journey</h2>
+
+    <div class="progress-summary">
+        <h3>Progress Summary</h3>
+        <p>Total Goals: {{ summary.total_goals }}</p>
+        <p>Completed Goals: {{ summary.completed_goals }}</p>
+        <p>Recent Activities: {{ summary.recent_activities }}</p>
+    </div>
+
+    <div class="goals-section">
+        <h3>Your Goals</h3>
+        <form id="goal-form">
+            <input type="text" name="description" placeholder="Enter your goal" required>
+            <input type="date" name="target_date" required>
+            <button type="submit">Set New Goal</button>
+        </form>
+        <ul id="goal-list">
+            {% for goal in goals %}
+                <li {% if goal.completed %}class="completed"{% endif %}>
+                    {{ goal.description }} (Target: {{ goal.target_date }})
+                    {% if not goal.completed %}
+                        <button onclick="completeGoal({{ loop.index0 }})">Complete</button>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="activities-section">
+        <h3>Recent Activities</h3>
+        <ul>
+            {% for activity in activities %}
+                <li>{{ activity.type }}: {{ activity.details }} ({{ activity.timestamp }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        document.getElementById('goal-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch('/set_goal', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();  // Refresh to show the new goal
+                }
+            });
+        });
+
+        function completeGoal(goalIndex) {
+            fetch(`/complete_goal/${goalIndex}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();  // Refresh to update the goal status
+                }
+            });
+        }
+    </script>
+{% endblock %}

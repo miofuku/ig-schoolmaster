@@ -128,3 +128,74 @@ footer {
     padding: 1rem;
     margin-top: 2rem;
 }
+
+.progress-summary, .goals-section, .activities-section {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+}
+
+#goal-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+#goal-form input {
+    flex-grow: 1;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+#goal-form button {
+    padding: 5px 10px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#goal-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#goal-list li {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#goal-list li.completed {
+    text-decoration: line-through;
+    color: #888;
+}
+
+#goal-list button {
+    padding: 5px 10px;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.activities-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.activities-section li {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 3px;
+}
