@@ -26,7 +26,8 @@ def index():
 @app.route('/explore')
 def explore():
     books = book_repo.get_random_books(5)
-    return render_template('explore.html', books=books)
+    reading_prompt = ai_facilitator.generate_prompt('reading')
+    return render_template('explore.html', books=books, reading_prompt=reading_prompt)
 
 
 @app.route('/search')
@@ -66,7 +67,8 @@ def discuss_book(book_id):
 
     book = book_repo.get_book_by_id(book_id)
     posts = peer_platform.get_discussion_posts(book_id)
-    return render_template('discuss.html', book=book, posts=posts)
+    discussion_prompt = ai_facilitator.generate_prompt('discussion')
+    return render_template('discuss.html', book=book, posts=posts, discussion_prompt=discussion_prompt)
 
 
 @app.route('/reply/<int:book_id>/<int:post_index>', methods=['POST'])
@@ -125,11 +127,27 @@ def log_activity():
     return jsonify({'success': True})
 
 
-@app.route('/facilitate', methods=['POST'])
-def facilitate():
+@app.route('/get_prompt', methods=['POST'])
+def get_prompt():
     context = request.json['context']
-    prompt = ai_facilitator.generate_prompt(context)
+    user_id = session.get('user_id', 'anonymous')
+    user_data = {
+        'recent_activities': progress_tracker.get_activities(user_id, limit=1)
+    }
+    prompt = ai_facilitator.generate_prompt(context, user_data)
     return jsonify({'prompt': prompt})
+
+
+@app.route('/reflect_on_goal/<int:goal_index>')
+def reflect_on_goal(goal_index):
+    user_id = session.get('user_id', 'anonymous')
+    goals = progress_tracker.get_goals(user_id)
+    if goal_index < len(goals):
+        goal = goals[goal_index]['description']
+        reflection_prompt = ai_facilitator.generate_reflection_prompt(goal)
+        return jsonify({'prompt': reflection_prompt})
+    else:
+        return jsonify({'error': 'Goal not found'}), 404
 
 
 @app.route('/map_knowledge', methods=['POST'])

@@ -26,9 +26,15 @@
                     {% if not goal.completed %}
                         <button onclick="completeGoal({{ loop.index0 }})">Complete</button>
                     {% endif %}
+                    <button onclick="reflectOnGoal({{ loop.index0 }})">Reflect</button>
                 </li>
             {% endfor %}
         </ul>
+    </div>
+
+    <div class="reflection-prompt" style="display: none;">
+        <h3>Reflection Prompt:</h3>
+        <p id="reflection-text"></p>
     </div>
 
     <div class="activities-section">
@@ -65,6 +71,14 @@
                 if (data.success) {
                     location.reload();  // Refresh to update the goal status
                 }
+            });
+        }
+        function reflectOnGoal(goalIndex) {
+            fetch(`/reflect_on_goal/${goalIndex}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('reflection-text').textContent = data.prompt;
+                document.querySelector('.reflection-prompt').style.display = 'block';
             });
         }
     </script>

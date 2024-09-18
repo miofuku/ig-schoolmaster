@@ -4,6 +4,10 @@
 
 {% block content %}
     <h2>Explore Books</h2>
+    <div class="ai-prompt">
+        <h3>Reflection Prompt:</h3>
+        <p>{{ reading_prompt }}</p>
+    </div>
     <div class="book-list">
         {% for book in books %}
             <div class="book-item">
@@ -19,6 +23,7 @@
             </div>
         {% endfor %}
     </div>
+    <button id="new-prompt-btn">Get New Prompt</button>
     <script>
         function generateQuestions(bookId) {
             fetch('/question', {
@@ -38,5 +43,18 @@
                 questionsContainer.style.display = 'block';
             });
         }
+        document.getElementById('new-prompt-btn').addEventListener('click', function() {
+            fetch('/get_prompt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({context: 'reading'}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('.ai-prompt p').textContent = data.prompt;
+            });
+        });
     </script>
 {% endblock %}

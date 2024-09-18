@@ -6,6 +6,11 @@
     <h2>Discuss: {{ book.title }}</h2>
     <p>By {{ book.author }}</p>
     
+    <div class="ai-prompt">
+        <h3>Discussion Prompt:</h3>
+        <p>{{ discussion_prompt }}</p>
+    </div>
+
     <h3>Start a Discussion</h3>
     <form action="{{ url_for('discuss_book', book_id=book.id) }}" method="post">
         <textarea name="content" rows="4" cols="50" required></textarea>
@@ -18,7 +23,7 @@
         <div class="post">
             <p>{{ post.content }}</p>
             <small>Posted by {{ post.user_id }} on {{ post.timestamp }}</small>
-            
+
             <h4>Replies</h4>
             {% for reply in post.replies %}
                 <div class="reply">
@@ -26,13 +31,15 @@
                     <small>Replied by {{ reply.user_id }} on {{ reply.timestamp }}</small>
                 </div>
             {% endfor %}
-            
+
             <form class="reply-form" data-book-id="{{ book.id }}" data-post-index="{{ loop.index0 }}">
                 <textarea name="content" rows="2" cols="40" required></textarea>
                 <button type="submit">Reply</button>
             </form>
         </div>
     {% endfor %}
+
+    <button id="new-prompt-btn">Get New Prompt</button>
 
     <script>
         document.querySelectorAll('.reply-form').forEach(form => {
@@ -61,6 +68,19 @@
                     this.insertAdjacentHTML('beforebegin', replyHtml);
                     this.reset();
                 });
+            });
+        });
+        document.getElementById('new-prompt-btn').addEventListener('click', function() {
+            fetch('/get_prompt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({context: 'discussion'}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('.ai-prompt p').textContent = data.prompt;
             });
         });
     </script>
