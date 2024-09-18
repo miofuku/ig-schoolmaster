@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Study Groups - Ignorant Schoolmaster AI{% endblock %}
+
+{% block content %}
+    <h2>Study Groups</h2>
+
+    <h3>Create a New Study Group</h3>
+    <form id="create-group-form">
+        <label for="group-name">Group Name:</label>
+        <input type="text" id="group-name" name="name" required>
+        <br>
+        <label for="book-select">Select Books:</label>
+        <select id="book-select" name="book_ids" multiple required>
+            {% for book in books %}
+                <option value="{{ book.id }}">{{ book.title }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <button type="submit">Create Group</button>
+    </form>
+
+    <h3>Your Study Groups</h3>
+    <ul id="group-list">
+        {% for group in groups %}
+            <li>
+                <h4>{{ group.name }}</h4>
+                <p>Members: {{ group.members|join(', ') }}</p>
+                <p>Books:</p>
+                <ul>
+                    {% for book_id in group.book_ids %}
+                        <li>{{ book_repo.get_book_by_id(book_id).title }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        document.getElementById('create-group-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('/study_groups', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Refresh the page to show the new group
+                location.reload();
+            });
+        });
+    </script>
+{% endblock %}

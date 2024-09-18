@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 from universal_book.repository import UniversalBookRepository
 from question_generator.generator import QuestionGenerator
 from peer_platform.collaboration import PeerCollaborationPlatform
@@ -7,6 +7,7 @@ from ai_facilitator.facilitator import AIFacilitator
 from knowledge_map.mapper import KnowledgeMapper
 
 app = Flask(__name__, template_folder='templates')
+app.secret_key = 'your_secret_key'  # Set a secret key for sessions
 
 book_repo = UniversalBookRepository()
 question_gen = QuestionGenerator()
@@ -54,11 +55,38 @@ def get_question():
         return jsonify({'error': 'An error occurred while generating questions'}), 500
 
 
-@app.route('/peer_teach', methods=['POST'])
-def peer_teach():
-    lesson = request.json['lesson']
-    peer_platform.submit_lesson(lesson)
-    return jsonify({'status': 'success'})
+@app.route('/discuss/<int:book_id>', methods=['GET', 'POST'])
+def discuss_book(book_id):
+    if request.method == 'POST':
+        content = request.form.get('content')
+        user_id = session.get('user_id', 'anonymous')  # In a real app, you'd use proper user authentication
+        peer_platform.add_discussion_post(book_id, user_id, content)
+
+    book = book_repo.get_book_by_id(book_id)
+    posts = peer_platform.get_discussion_posts(book_id)
+    return render_template('discuss.html', book=book, posts=posts)
+
+
+@app.route('/reply/<int:book_id>/<int:post_index>', methods=['POST'])
+def reply_to_post(book_id, post_index):
+    content = request.form.get('content')
+    user_id = session.get('user_id', 'anonymous')
+    reply = peer_platform.add_reply(book_id, post_index, user_id, content)
+    return jsonify(reply)
+
+
+@app.route('/study_groups', methods=['GET', 'POST'])
+def study_groups():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        book_ids = request.form.getlist('book_ids')
+        user_id = session.get('user_id', 'anonymous')
+        group_id = peer_platform.create_study_group(name, user_id, book_ids)
+        return jsonify({'group_id': group_id})
+
+    user_id = session.get('user_id', 'anonymous')
+    groups = peer_platform.get_user_study_groups(user_id)
+    return render_template('study_groups.html', groups=groups)
 
 
 @app.route('/track_progress', methods=['POST'])

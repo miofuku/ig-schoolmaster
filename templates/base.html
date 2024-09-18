@@ -12,10 +12,11 @@
         <nav>
             <ul>
                 <li><a href="{{ url_for('index') }}">Home</a></li>
-                <li><a href="{{ url_for('explore') }}">Explore</a></li>
+                <li><a href="{{ url_for('explore') }}">Explore Books</a></li>
+                <li><a href="{{ url_for('study_groups') }}">Study Groups</a></li>
             </ul>
         </nav>
-        <form action="{{ url_for('search') }}" method="get">
+        <form action="{{ url_for('search') }}" method="get" class="search-form">
             <input type="text" name="q" placeholder="Search books...">
             <button type="submit">Search</button>
         </form>
