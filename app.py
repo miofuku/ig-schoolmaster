@@ -1,50 +1,58 @@
-from transformers import GPTNeoForCausalLM, GPT2Tokenizer
-from utils.data_utils import load_course_data
-from utils.knowledge_graph import KnowledgeGraph
-from utils.personalization import PersonalizedTutor
-from utils.model_utils import pretrain_model, fine_tune_model
-import config
+from flask import Flask, render_template, request, jsonify
+from universal_book.repository import UniversalBookRepository
+from question_generator.generator import QuestionGenerator
+from peer_platform.collaboration import PeerCollaborationPlatform
+from progress_tracker.tracker import ProgressTracker
+from ai_facilitator.facilitator import AIFacilitator
+from knowledge_map.mapper import KnowledgeMapper
 
-def main():
-    # Load pre-trained model and tokenizer
-    model = GPTNeoForCausalLM.from_pretrained('EleutherAI/gpt-neo-125M')
-    model.to(config.DEVICE)
-    tokenizer = GPT2Tokenizer.from_pretrained('EleutherAI/gpt-neo-125M')
+app = Flask(__name__)
 
-    # Load course data and knowledge graph
-    course_content, course_qa = load_course_data('data/course_content.txt', 'data/course_qa.json')
-    knowledge_graph = KnowledgeGraph('data/knowledge_graph.json')
+book_repo = UniversalBookRepository()
+question_gen = QuestionGenerator()
+peer_platform = PeerCollaborationPlatform()
+progress_tracker = ProgressTracker()
+ai_facilitator = AIFacilitator()
+knowledge_mapper = KnowledgeMapper()
 
-    # Pre-train the model with supplementary data
-    pretrain_model(model, tokenizer, 'data/supplementary_data.txt')
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-    # Initialize personalized tutor
-    tutor = PersonalizedTutor(model, tokenizer, knowledge_graph)
+@app.route('/explore')
+def explore():
+    books = book_repo.get_random_books(5)
+    return render_template('explore.html', books=books)
 
-    # Main interaction loop
-    while True:
-        user_input = input("Student: ")
-        if user_input.lower() == 'exit':
-            break
+@app.route('/question', methods=['POST'])
+def get_question():
+    topic = request.json['topic']
+    question = question_gen.generate_question(topic)
+    return jsonify({'question': question})
 
-        response = tutor.respond(user_input, course_content, course_qa)
-        print(f"Virtual Teacher: {response}")
+@app.route('/peer_teach', methods=['POST'])
+def peer_teach():
+    lesson = request.json['lesson']
+    peer_platform.submit_lesson(lesson)
+    return jsonify({'status': 'success'})
 
-        # Get user feedback
-        user_feedback = input("Was this response helpful? (y/n): ")
+@app.route('/track_progress', methods=['POST'])
+def track_progress():
+    goal = request.json['goal']
+    progress = progress_tracker.update_progress(goal)
+    return jsonify({'progress': progress})
 
-        # If the response wasn't helpful, fine-tune the model
-        if user_feedback.lower() == 'n':
-            print("I'm sorry the response wasn't helpful. I'll learn from this interaction.")
-            fine_tune_model(model, tokenizer, user_input, response, course_content, knowledge_graph)
-            print("I've updated my knowledge. Let me try to answer your question again.")
-            
-            # Generate a new response after fine-tuning
-            response = tutor.respond(user_input, course_content, course_qa)
-            print(f"Virtual Teacher: {response}")
+@app.route('/facilitate', methods=['POST'])
+def facilitate():
+    context = request.json['context']
+    prompt = ai_facilitator.generate_prompt(context)
+    return jsonify({'prompt': prompt})
 
-        # Update student profile based on interaction
-        tutor.update_student_profile(user_input, response, user_feedback)
+@app.route('/map_knowledge', methods=['POST'])
+def map_knowledge():
+    concepts = request.json['concepts']
+    knowledge_map = knowledge_mapper.create_map(concepts)
+    return jsonify({'map': knowledge_map})
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    app.run(debug=True)
