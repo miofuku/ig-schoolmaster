@@ -1,7 +1,6 @@
 # The Ignorant Schoolmaster
 
-The Ignorant Schoolmaster AI is an innovative educational platform inspired by Jacques Rancière's philosophy of intellectual emancipation. Unlike traditional AI tutors, this system aims to empower students in their self-directed learning journey, promoting autonomy, critical thinking, and peer collaboration.
-
+The Ignorant Schoolmaster AI is an innovative educational platform inspired by Jacques Rancière's philosophy of intellectual emancipation. This system aims to empower students in their self-directed learning journey, promoting autonomy, critical thinking, and peer collaboration. Unlike traditional AI tutors, this platform serves as a facilitator rather than an instructor, encouraging students to construct their own understanding.
 ## Core Principles
 
 - Promote student autonomy and self-discovery
@@ -38,12 +37,19 @@ The Ignorant Schoolmaster AI is an innovative educational platform inspired by J
    pip install -r requirements.txt
    ```
 
-4. Run the application with trained model:
+4. Set up the environment variables: Create a `.env` file in the root directory and add:
    ```
-   python3 app.py
+   FLASK_APP=app.py
+   FLASK_ENV=development
+   SECRET_KEY=your_secret_key_here
+   ```
+
+5. Run the application with trained model:
+   ```
+   flask run
    ```
    
-5. Open a web browser and navigate to `http://localhost:5000`
+6. Open a web browser and navigate to `http://localhost:5000`
 
 ## Project Structure
 
@@ -54,15 +60,8 @@ The Ignorant Schoolmaster AI is an innovative educational platform inspired by J
 - `progress_tracker/`: Self-assessment and goal-setting tools
 - `ai_facilitator/`: Minimal AI guidance implementation
 - `knowledge_map/`: Open-ended concept mapping tools
-
-## API Endpoints
-
-* `/explore`: GET request to explore random books
-* `/question`: POST request to generate a question on a given topic
-* `/peer_teach`: POST request to submit a peer teaching lesson
-* `/track_progress`: POST request to update progress on a goal
-* `/facilitate`: POST request to get a facilitation prompt
-* `/map_knowledge`: POST request to create connections between concepts
+- `templates/`: HTML templates for the web interface
+- `static/`: CSS and JavaScript files
 
 ## Future Enhancements
 
