@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Ignorant Schoolmaster AI{% endblock %}
+
+{% block content %}
+    <h2>Welcome to the Ignorant Schoolmaster AI</h2>
+    <p>This platform is designed to empower your self-directed learning journey. Here's what you can do:</p>
+    <ul>
+        <li>Explore a diverse range of texts in our Universal Book Repository</li>
+        <li>Engage with thought-provoking questions to deepen your understanding</li>
+        <li>Collaborate with peers and share your knowledge</li>
+        <li>Track your progress on self-set learning goals</li>
+        <li>Create your own knowledge connections</li>
+    </ul>
+    <p>Remember, the power to learn is within you. This AI is here to facilitate, not to instruct.</p>
+    <a href="{{ url_for('explore') }}" class="cta-button">Start Exploring</a>
+{% endblock %}

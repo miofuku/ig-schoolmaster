@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Explore - Ignorant Schoolmaster AI{% endblock %}
+
+{% block content %}
+    <h2>Explore Books</h2>
+    <div class="book-list">
+        {% for book in books %}
+            <div class="book-item">
+                <h3>{{ book.title }}</h3>
+                <p>By {{ book.author }}</p>
+                <button onclick="generateQuestion('{{ book.title }}')">Generate Question</button>
+            </div>
+        {% endfor %}
+    </div>
+    <div id="question-container" style="display: none;">
+        <h3>Thought-Provoking Question:</h3>
+        <p id="generated-question"></p>
+    </div>
+    <script>
+        function generateQuestion(bookTitle) {
+            fetch('/question', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({topic: bookTitle}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('generated-question').textContent = data.question;
+                document.getElementById('question-container').style.display = 'block';
+            });
+        }
+    </script>
+{% endblock %}

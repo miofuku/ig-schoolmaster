@@ -6,7 +6,7 @@ from progress_tracker.tracker import ProgressTracker
 from ai_facilitator.facilitator import AIFacilitator
 from knowledge_map.mapper import KnowledgeMapper
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 
 book_repo = UniversalBookRepository()
 question_gen = QuestionGenerator()
