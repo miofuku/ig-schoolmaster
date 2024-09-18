@@ -15,6 +15,10 @@
                 <li><a href="{{ url_for('explore') }}">Explore</a></li>
             </ul>
         </nav>
+        <form action="{{ url_for('search') }}" method="get">
+            <input type="text" name="q" placeholder="Search books...">
+            <button type="submit">Search</button>
+        </form>
     </header>
 
     <main>

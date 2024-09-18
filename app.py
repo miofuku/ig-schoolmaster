@@ -27,6 +27,13 @@ def explore():
     return render_template('explore.html', books=books)
 
 
+@app.route('/search')
+def search():
+    query = request.args.get('q', '')
+    books = book_repo.search_books(query)
+    return render_template('search.html', books=books, query=query)
+
+
 @app.route('/question', methods=['POST'])
 def get_question():
     topic = request.json['topic']
