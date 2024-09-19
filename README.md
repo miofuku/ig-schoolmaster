@@ -37,19 +37,12 @@ The Ignorant Schoolmaster AI is an innovative educational platform inspired by J
    pip install -r requirements.txt
    ```
 
-4. Set up the environment variables: Create a `.env` file in the root directory and add:
+4. Run the application with trained model:
    ```
-   FLASK_APP=app.py
-   FLASK_ENV=development
-   SECRET_KEY=your_secret_key_here
-   ```
-
-5. Run the application with trained model:
-   ```
-   flask run
+   python3 app.py
    ```
    
-6. Open a web browser and navigate to `http://localhost:5000`
+5. Open a web browser and navigate to `http://localhost:5000`
 
 ## Project Structure
 

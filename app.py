@@ -124,7 +124,8 @@ def study_groups():
 
     user_id = session.get('user_id', 'anonymous')
     groups = peer_platform.get_user_study_groups(user_id)
-    return render_template('study_groups.html', groups=groups, books=book_repo.books)
+    books = book_repo.get_random_books(10)  # Get some books to display in the form
+    return render_template('study_groups.html', groups=groups, books=books)
 
 
 @app.route('/set_goal', methods=['POST'])
