@@ -5,7 +5,6 @@ from peer_platform.collaboration import PeerCollaborationPlatform
 from progress_tracker.tracker import ProgressTracker
 from ai_facilitator.facilitator import AIFacilitator
 from knowledge_map.mapper import KnowledgeMapper
-from datetime import datetime
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = 'your_secret_key'  # Set a secret key for sessions
@@ -58,6 +57,7 @@ def get_question():
     except Exception as e:
         app.logger.error(f"Error generating question: {str(e)}")
         return jsonify({'error': 'An error occurred while generating the question'}), 500
+
 
 @app.route('/discuss/<int:book_id>', methods=['GET', 'POST'])
 def discuss_book(book_id):
@@ -118,7 +118,8 @@ def view_progress():
     activities = progress_tracker.get_activities(user_id)
     summary = progress_tracker.get_progress_summary(user_id)
     reflection_prompt = ai_facilitator.generate_reflection_prompt("your learning journey")
-    return render_template('progress.html', goals=goals, activities=activities, summary=summary, reflection_prompt=reflection_prompt)
+    return render_template('progress.html', goals=goals, activities=activities, summary=summary,
+                           reflection_prompt=reflection_prompt)
 
 
 @app.route('/log_activity', methods=['POST'])
