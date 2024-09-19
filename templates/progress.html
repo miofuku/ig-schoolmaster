@@ -1,9 +1,12 @@
 {% extends "base.html" %}
-
 {% block title %}Your Progress - Ignorant Schoolmaster AI{% endblock %}
-
 {% block content %}
     <h2>Your Learning Journey</h2>
+
+    <div class="reflection-prompt">
+        <h3>Reflection Prompt:</h3>
+        <p>{{ reflection_prompt }}</p>
+    </div>
 
     <div class="progress-summary">
         <h3>Progress Summary</h3>
@@ -32,11 +35,6 @@
         </ul>
     </div>
 
-    <div class="reflection-prompt" style="display: none;">
-        <h3>Reflection Prompt:</h3>
-        <p id="reflection-text"></p>
-    </div>
-
     <div class="activities-section">
         <h3>Recent Activities</h3>
         <ul>
@@ -45,41 +43,4 @@
             {% endfor %}
         </ul>
     </div>
-
-    <script>
-        document.getElementById('goal-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            fetch('/set_goal', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();  // Refresh to show the new goal
-                }
-            });
-        });
-
-        function completeGoal(goalIndex) {
-            fetch(`/complete_goal/${goalIndex}`, {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();  // Refresh to update the goal status
-                }
-            });
-        }
-        function reflectOnGoal(goalIndex) {
-            fetch(`/reflect_on_goal/${goalIndex}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('reflection-text').textContent = data.prompt;
-                document.querySelector('.reflection-prompt').style.display = 'block';
-            });
-        }
-    </script>
 {% endblock %}

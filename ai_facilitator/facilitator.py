@@ -58,17 +58,8 @@ class AIFacilitator:
         else:
             return selected_prompt
 
-    def generate_rule_based_prompt(self, context):
-        # Implement rule-based prompt generation here
-        templates = {
-            "reading": "How does {topic} relate to your personal experiences?",
-            "discussion": "What new perspectives on {topic} have you gained from this conversation?",
-            "goal_setting": "How might achieving {goal} impact your broader learning journey?",
-        }
-        return templates.get(context, "What insights have you gained about {topic}?")
-
     def generate_lm_prompt(self, context):
-        input_text = f"Generate a thought-provoking reflection question about {context}:"
+        input_text = f"Generate a thought-provoking question about {context}:"
         inputs = self.tokenizer(input_text, return_tensors="pt", padding=True, truncation=True)
 
         try:
@@ -76,7 +67,7 @@ class AIFacilitator:
                 output = self.model.generate(
                     input_ids=inputs.input_ids,
                     attention_mask=inputs.attention_mask,
-                    max_length=100,  # Increased max_length for more detailed prompts
+                    max_length=100,
                     num_return_sequences=1,
                     temperature=0.7,
                     pad_token_id=self.tokenizer.pad_token_id,
@@ -91,7 +82,7 @@ class AIFacilitator:
             return generated_prompt
         except Exception as e:
             print(f"Error generating prompt: {str(e)}")
-            return f"How has your understanding of {context} evolved through your recent experiences?"
+            return f"How might {context} relate to your broader learning experiences?"
 
     def combine_and_filter_prompts(self, rule_based_prompt, lm_prompt):
         # Implement logic to combine and filter prompts
@@ -106,17 +97,29 @@ class AIFacilitator:
             return f"Considering your recent {recent_activity['type']}, {prompt}"
         return prompt
 
-    def generate_reflection_prompt(self, goal):
-        reflection_templates = [
-            "How has working towards '{goal}' changed your perspective on learning?",
-            "What unexpected challenges or insights did you encounter while pursuing '{goal}'?",
-            "In what ways has your approach to '{goal}' evolved since you started?",
-            "How might the skills or knowledge gained from '{goal}' apply to future learning objectives?",
-            "What aspects of working on '{goal}' have you found most rewarding or interesting?",
-            "If you were to approach '{goal}' again, what would you do differently and why?",
-            "How has achieving (or working towards) '{goal}' influenced your next steps in learning?",
-            "What connections have you discovered between '{goal}' and other areas of your studies or life?"
-        ]
+    def generate_explore_questions(self, book):
+        # Ensure book is a dictionary and has the required keys
+        if not isinstance(book, dict) or 'title' not in book or 'author' not in book:
+            raise ValueError("Invalid book data provided")
 
-        return random.choice(reflection_templates).format(goal=goal)
+        rule_based_prompt = random.choice([
+            f"How does the theme of '{book['title']}' relate to contemporary issues?",
+            f"What questions would you ask the author of '{book['title']}' if you had the chance?",
+            f"How might the ideas in '{book['title']}' challenge your existing beliefs?",
+            f"What connections can you draw between '{book['title']}' and other books you've read?",
+            f"How could the concepts in '{book['title']}' be applied to solve real-world problems?"
+        ])
+        lm_prompt = self.generate_lm_prompt(f"the book '{book['title']}' by {book['author']}")
+        return self.combine_and_filter_prompts(rule_based_prompt, lm_prompt)
+
+    def generate_reflection_prompt(self, context):
+        rule_based_prompt = random.choice([
+            f"How has your approach to learning evolved throughout {context}?",
+            f"What unexpected insights have you gained during {context}?",
+            f"In what ways have your goals shifted or become clearer through {context}?",
+            f"How might the skills you've developed in {context} apply to other areas of your life?",
+            f"What aspects of {context} have you found most challenging or rewarding?"
+        ])
+        lm_prompt = self.generate_lm_prompt(f"reflection on {context}")
+        return self.combine_and_filter_prompts(rule_based_prompt, lm_prompt)
 

@@ -1,13 +1,8 @@
 {% extends "base.html" %}
-
 {% block title %}Explore Books - Ignorant Schoolmaster AI{% endblock %}
-
 {% block content %}
     <h2>Explore Books</h2>
-    <div class="ai-prompt">
-        <h3>Reflection Prompt:</h3>
-        <p>{{ reading_prompt }}</p>
-    </div>
+
     <div class="book-list">
         {% for book in books %}
             <div class="book-item">
@@ -16,45 +11,36 @@
                 <p>{{ book.summary }}</p>
                 <p>Tags: {{ book.tags|join(', ') }}</p>
                 <div class="book-actions">
-                    <button onclick="generateQuestions('{{ book.id }}')">Generate Questions</button>
+                    <button onclick="generateQuestion({{ book.id }})">Generate Question</button>
                     <a href="{{ url_for('discuss_book', book_id=book.id) }}" class="button">Join Discussion</a>
                 </div>
-                <div class="questions-container" id="questions-{{ book.id }}" style="display: none;"></div>
+                <div id="question-{{ book.id }}" class="question-container" style="display: none;"></div>
             </div>
         {% endfor %}
     </div>
-    <button id="new-prompt-btn">Get New Prompt</button>
+
     <script>
-        function generateQuestions(bookId) {
-            fetch('/question', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({book_id: bookId}),
-            })
-            .then(response => response.json())
-            .then(data => {
-                const questionsContainer = document.getElementById(`questions-${bookId}`);
-                questionsContainer.innerHTML = '<h4>Thought-Provoking Questions:</h4>';
-                data.questions.forEach(question => {
-                    questionsContainer.innerHTML += `<p>${question}</p>`;
-                });
-                questionsContainer.style.display = 'block';
-            });
-        }
-        document.getElementById('new-prompt-btn').addEventListener('click', function() {
-            fetch('/get_prompt', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({context: 'reading'}),
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.querySelector('.ai-prompt p').textContent = data.prompt;
-            });
+    function generateQuestion(bookId) {
+        fetch('/question', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({book_id: bookId}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.question) {
+                const questionContainer = document.getElementById(`question-${bookId}`);
+                questionContainer.innerHTML = `<p><strong>Thought-provoking question:</strong> ${data.question}</p>`;
+                questionContainer.style.display = 'block';
+            } else {
+                console.error('Error:', data.error);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
         });
+    }
     </script>
 {% endblock %}

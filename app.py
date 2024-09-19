@@ -26,8 +26,7 @@ def index():
 @app.route('/explore')
 def explore():
     books = book_repo.get_random_books(5)
-    reading_prompt = ai_facilitator.generate_prompt('reading')
-    return render_template('explore.html', books=books, reading_prompt=reading_prompt)
+    return render_template('explore.html', books=books)
 
 
 @app.route('/search')
@@ -50,12 +49,15 @@ def get_question():
         return jsonify({'error': 'Book not found'}), 404
 
     try:
-        questions = question_gen.generate_multiple_questions(book, n=3)
-        return jsonify({'questions': questions})
+        # Ensure book is a dictionary with required keys
+        if isinstance(book, dict) and 'title' in book and 'author' in book:
+            question = ai_facilitator.generate_explore_questions(book)
+            return jsonify({'question': question})
+        else:
+            raise ValueError("Invalid book data")
     except Exception as e:
-        app.logger.error(f"Error generating questions: {str(e)}")
-        return jsonify({'error': 'An error occurred while generating questions'}), 500
-
+        app.logger.error(f"Error generating question: {str(e)}")
+        return jsonify({'error': 'An error occurred while generating the question'}), 500
 
 @app.route('/discuss/<int:book_id>', methods=['GET', 'POST'])
 def discuss_book(book_id):
@@ -115,7 +117,8 @@ def view_progress():
     goals = progress_tracker.get_goals(user_id)
     activities = progress_tracker.get_activities(user_id)
     summary = progress_tracker.get_progress_summary(user_id)
-    return render_template('progress.html', goals=goals, activities=activities, summary=summary)
+    reflection_prompt = ai_facilitator.generate_reflection_prompt("your learning journey")
+    return render_template('progress.html', goals=goals, activities=activities, summary=summary, reflection_prompt=reflection_prompt)
 
 
 @app.route('/log_activity', methods=['POST'])
