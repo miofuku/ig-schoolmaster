@@ -1,69 +1,122 @@
 import random
 from collections import defaultdict
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
 
 
 class AIFacilitator:
     def __init__(self):
+        self.tokenizer = AutoTokenizer.from_pretrained("distilgpt2")
+        self.model = AutoModelForCausalLM.from_pretrained("distilgpt2")
+
+        if self.tokenizer.pad_token_id is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            self.model.config.pad_token_id = self.model.config.eos_token_id
+
         self.context_prompts = defaultdict(list)
-        self.general_prompts = [
-            "What connections do you see between this and other topics you've explored?",
-            "How might you apply this concept in a real-world situation?",
-            "What questions arise as you think about this topic?",
-            "Can you think of any potential challenges or limitations to this idea?",
-            "How would you explain this concept to someone unfamiliar with the subject?",
-        ]
         self.initialize_context_prompts()
 
     def initialize_context_prompts(self):
         self.context_prompts['reading'] = [
-            "What emotions or thoughts did this passage evoke for you?",
-            "How does this text relate to your personal experiences?",
-            "If you could ask the author one question, what would it be?",
-            "Which character's perspective resonates with you the most, and why?",
-            "How might this story be different if told from another character's point of view?",
+            "How does the text challenge or reinforce your existing beliefs?",
+            "What connections can you draw between this reading and your personal experiences?",
+            "If you could ask the author one question, what would it be and why?",
+            "How might this text be interpreted differently in various cultural contexts?",
+            "What aspects of the reading did you find most thought-provoking or surprising?"
         ]
         self.context_prompts['discussion'] = [
-            "How do your peers' interpretations differ from your own?",
-            "What new insights have you gained from this discussion?",
-            "How has your understanding of the topic evolved through this conversation?",
-            "What aspects of the discussion challenged your initial thoughts?",
-            "How might you synthesize the different viewpoints presented here?",
+            "How have your peers' perspectives influenced your understanding of the topic?",
+            "What new questions have emerged for you during this discussion?",
+            "How might you apply the insights from this discussion to real-world situations?",
+            "What aspects of the discussion challenged your initial thoughts on the subject?",
+            "How would you synthesize the different viewpoints presented in this conversation?"
         ]
         self.context_prompts['goal_setting'] = [
-            "What inspired you to set this particular goal?",
-            "How do you think achieving this goal will impact your learning journey?",
-            "What potential obstacles do you foresee, and how might you overcome them?",
-            "How does this goal relate to your broader interests or aspirations?",
-            "What resources or support might you need to achieve this goal?",
+            "How does this goal align with your broader learning objectives?",
+            "What potential obstacles do you foresee in achieving this goal, and how might you overcome them?",
+            "How might achieving this goal impact your approach to future learning?",
+            "What resources or support might you need to successfully reach this goal?",
+            "How will you measure your progress towards this goal?"
         ]
 
     def generate_prompt(self, context, user_data=None):
         context_specific_prompts = self.context_prompts.get(context, [])
-        all_prompts = context_specific_prompts + self.general_prompts
+
+        if not context_specific_prompts:
+            context_specific_prompts = [
+                f"What aspects of {context} do you find most intriguing?",
+                f"How might {context} relate to your broader learning journey?",
+                f"What questions arise as you think about {context}?",
+                f"How would you explain {context} to someone unfamiliar with the subject?",
+                f"What potential implications or consequences do you see arising from {context}?"
+            ]
+
+        selected_prompt = random.choice(context_specific_prompts)
 
         if user_data:
-            return self.personalize_prompt(all_prompts, user_data)
+            return self.personalize_prompt(selected_prompt, user_data)
         else:
-            return random.choice(all_prompts)
+            return selected_prompt
 
-    def personalize_prompt(self, prompts, user_data):
-        # This is a simple personalization method. In a more advanced system,
-        # you could use NLP techniques or machine learning to generate more
-        # tailored prompts based on the user's activity history, goals, etc.
-        if 'recent_activities' in user_data:
-            recent_activity = user_data['recent_activities'][0] if user_data['recent_activities'] else None
-            if recent_activity:
-                return f"Considering your recent {recent_activity['type']}, {random.choice(prompts)}"
+    def generate_rule_based_prompt(self, context):
+        # Implement rule-based prompt generation here
+        templates = {
+            "reading": "How does {topic} relate to your personal experiences?",
+            "discussion": "What new perspectives on {topic} have you gained from this conversation?",
+            "goal_setting": "How might achieving {goal} impact your broader learning journey?",
+        }
+        return templates.get(context, "What insights have you gained about {topic}?")
 
-        return random.choice(prompts)
+    def generate_lm_prompt(self, context):
+        input_text = f"Generate a thought-provoking reflection question about {context}:"
+        inputs = self.tokenizer(input_text, return_tensors="pt", padding=True, truncation=True)
+
+        try:
+            with torch.no_grad():
+                output = self.model.generate(
+                    input_ids=inputs.input_ids,
+                    attention_mask=inputs.attention_mask,
+                    max_length=100,  # Increased max_length for more detailed prompts
+                    num_return_sequences=1,
+                    temperature=0.7,
+                    pad_token_id=self.tokenizer.pad_token_id,
+                    do_sample=True
+                )
+            generated_prompt = self.tokenizer.decode(output[0], skip_special_tokens=True)
+
+            # Ensure the generated prompt ends with a question mark
+            if not generated_prompt.endswith('?'):
+                generated_prompt += '?'
+
+            return generated_prompt
+        except Exception as e:
+            print(f"Error generating prompt: {str(e)}")
+            return f"How has your understanding of {context} evolved through your recent experiences?"
+
+    def combine_and_filter_prompts(self, rule_based_prompt, lm_prompt):
+        # Implement logic to combine and filter prompts
+        # This could involve checking for alignment with philosophy, removing direct statements, etc.
+        combined = f"{rule_based_prompt} Additionally, {lm_prompt}"
+        # Add filtering logic here
+        return combined
+
+    def personalize_prompt(self, prompt, user_data):
+        if 'recent_activities' in user_data and user_data['recent_activities']:
+            recent_activity = user_data['recent_activities'][0]
+            return f"Considering your recent {recent_activity['type']}, {prompt}"
+        return prompt
 
     def generate_reflection_prompt(self, goal):
-        reflection_prompts = [
-            f"How has working towards '{goal}' changed your perspective?",
-            f"What unexpected challenges or opportunities did you encounter while pursuing '{goal}'?",
-            f"How might the skills or knowledge gained from '{goal}' apply to future learning?",
-            f"What would you do differently if you were to approach '{goal}' again?",
-            f"How has achieving (or working towards) '{goal}' influenced your next steps in learning?",
+        reflection_templates = [
+            "How has working towards '{goal}' changed your perspective on learning?",
+            "What unexpected challenges or insights did you encounter while pursuing '{goal}'?",
+            "In what ways has your approach to '{goal}' evolved since you started?",
+            "How might the skills or knowledge gained from '{goal}' apply to future learning objectives?",
+            "What aspects of working on '{goal}' have you found most rewarding or interesting?",
+            "If you were to approach '{goal}' again, what would you do differently and why?",
+            "How has achieving (or working towards) '{goal}' influenced your next steps in learning?",
+            "What connections have you discovered between '{goal}' and other areas of your studies or life?"
         ]
-        return random.choice(reflection_prompts)
+
+        return random.choice(reflection_templates).format(goal=goal)
 
