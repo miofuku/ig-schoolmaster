@@ -1,29 +1,22 @@
-import random
-import json
-from pathlib import Path
+from models import db, Book
 
 
 class UniversalBookRepository:
     def __init__(self):
-        self.books = self.load_books()
-
-    def load_books(self):
-        books_file = Path(__file__).parent / 'books.json'
-        with open(books_file, 'r') as f:
-            return json.load(f)
+        pass  # No need to load books from JSON file anymore
 
     def get_random_books(self, n):
-        return random.sample(self.books, min(n, len(self.books)))
+        return [book.to_dict() for book in Book.query.order_by(db.func.random()).limit(n).all()]
 
     def search_books(self, query):
-        return [book for book in self.books if query.lower() in book['title'].lower() or query.lower() in book['author'].lower()]
+        return [book.to_dict() for book in Book.query.filter(
+            (Book.title.ilike(f'%{query}%')) | (Book.author.ilike(f'%{query}%'))
+        ).all()]
 
     def get_book_by_id(self, book_id):
-        try:
-            book_id = int(book_id)
-        except ValueError:
-            return None
-        return next((book for book in self.books if book['id'] == book_id), None)
+        book = Book.query.get(book_id)
+        return book.to_dict() if book else None
 
     def get_book_by_title(self, title):
-        return next((book for book in self.books if book['title'].lower() == title.lower()), None)
+        book = Book.query.filter(Book.title.ilike(f'%{title}%')).first()
+        return book.to_dict() if book else None

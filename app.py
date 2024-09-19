@@ -1,14 +1,46 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
-from universal_book.repository import UniversalBookRepository
+from flask import Flask, render_template, request, jsonify, session
+from universal_book.repository import UniversalBookRepository, Book
 from question_generator.generator import QuestionGenerator
 from peer_platform.collaboration import PeerCollaborationPlatform
 from progress_tracker.tracker import ProgressTracker
 from ai_facilitator.facilitator import AIFacilitator
 from knowledge_map.mapper import KnowledgeMapper
+from models import db
+from models import Book
 
-app = Flask(__name__, template_folder='templates')
-app.secret_key = 'your_secret_key'  # Set a secret key for sessions
 
+def create_app():
+    app = Flask(__name__, template_folder='templates')
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///books.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.secret_key = 'your_secret_key'  # Set a secret key for sessions
+
+    db.init_app(app)
+
+    with app.app_context():
+        db.create_all()
+        init_db()
+
+    return app
+
+
+def init_db():
+    # Check if the database is empty and add some sample books if it is
+    if Book.query.count() == 0:
+        sample_books = [
+            Book(title="To Kill a Mockingbird", author="Harper Lee",
+                 summary="A novel about racial injustice and the loss of innocence.",
+                 tags="classic,fiction,racism"),
+            Book(title="1984", author="George Orwell",
+                 summary="A dystopian novel set in a totalitarian society.",
+                 tags="dystopia,fiction,politics"),
+            # Add more sample books as needed
+        ]
+        db.session.add_all(sample_books)
+        db.session.commit()
+
+
+app = create_app()
 book_repo = UniversalBookRepository()
 question_gen = QuestionGenerator()
 peer_platform = PeerCollaborationPlatform()
