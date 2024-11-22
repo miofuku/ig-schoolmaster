@@ -1,80 +1,64 @@
-# The Ignorant Schoolmaster
-
-The Ignorant Schoolmaster AI is an innovative educational platform inspired by Jacques Rancière's philosophy of intellectual emancipation. This system aims to empower students in their self-directed learning journey, promoting autonomy, critical thinking, and peer collaboration. Unlike traditional AI tutors, this platform serves as a facilitator rather than an instructor, encouraging students to construct their own understanding.
-## Core Principles
-
-- Promote student autonomy and self-discovery
-- Emphasize equality of intelligence among all learners
-- Focus on will and attention rather than knowledge transfer
-- Encourage peer learning and teaching
-- Position AI as a tool for emancipation, not as a knowledgeable master
-
-## Key Features
-
-- **Universal Book Repository**: A diverse digital library for free exploration
-- **Question Generator**: AI-powered tool for thought-provoking inquiries
-- **Peer Collaboration Platform**: Facilitates student-to-student learning
-- **Progress Tracker**: For self-set goals and reflection
-- **AI Facilitator**: Minimal guidance to maintain engagement
-- **Open-Ended Knowledge Map**: Student-generated concept connections
+# Ignorant Schoolmaster AI
 
 ## Getting Started
 
 1. Clone the repository:
-   ```
+   ```bash
    git clone https://github.com/miofuku/ig-schoolmaster.git
    cd ig-schoolmaster
    ```
 
 2. Create a virtual environment and activate it:
-   ```
+   ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
    ```
 
 3. Install the required packages:
-   ```
+   ```bash
    pip install -r requirements.txt
    ```
 
-4. Run the application with trained model:
-   ```
+4. Run the application:
+   ```bash
    python3 app.py
    ```
-   
+
 5. Open a web browser and navigate to `http://localhost:5000`
 
 ## Project Structure
 
-- `app.py`: Main application entry point
-- `universal_book/`: Digital library management
-- `question_generator/`: AI-powered question generation tools
-- `peer_platform/`: Peer collaboration and interaction features
-- `progress_tracker/`: Self-assessment and goal-setting tools
-- `ai_facilitator/`: Minimal AI guidance implementation
-- `knowledge_map/`: Open-ended concept mapping tools
-- `templates/`: HTML templates for the web interface
-- `static/`: CSS and JavaScript files
+- `app.py`: Main application entry point.
+- `universal_book/`: Digital library management, including book retrieval and search functionalities.
+- `question_generator/`: AI-powered question generation tools for books.
+- `peer_platform/`: Peer collaboration and interaction features, including discussion posts and study groups.
+- `progress_tracker/`: Self-assessment and goal-setting tools to track user progress.
+- `ai_facilitator/`: Minimal AI guidance implementation for generating prompts and questions.
+- `knowledge_map/`: Open-ended concept mapping tools for visualizing knowledge.
+- `templates/`: HTML templates for the web interface.
+- `static/`: CSS and JavaScript files for styling and interactivity.
+- `models.py`: Database models for SQLAlchemy, including the `Book` model.
+- `config.py`: Configuration settings, including loading environment variables.
 
 ## Future Enhancements
+- Implement user authentication and profiles.
+- Enhance the AI question generation with more context-aware prompts.
+- Add more interactive features for discussions and study groups.
+- Improve the UI/UX for better user engagement.
 
-* Implement user authentication and profiles
-* Create a more sophisticated Universal Book Repository with a larger, diverse collection of texts
-* Enhance the Question Generator with NLP techniques for more context-aware questions
-* Develop a full-fledged Peer Collaboration Platform with real-time interaction features
-* Expand the Progress Tracker with detailed analytics and visualizations
-* Improve the AI Facilitator with more advanced, adaptive prompting techniques
-* Create a visual interface for the Knowledge Mapper
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+## Dependencies
+- Flask
+- SQLAlchemy
+- LangChain (with community and OpenAI support)
+- Other libraries listed in `requirements.txt`
 
 ## License
+MIT License
 
-This project is licensed under the MIT License - see the `LICENSE.md` file for details.
+Copyright (c) 2024 Bijun Li
 
-## Acknowledgments
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-- Jacques Rancière for his groundbreaking work "The Ignorant Schoolmaster"
-- All contributors and supporters of self-directed learning initiatives
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
