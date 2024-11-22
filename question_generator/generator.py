@@ -1,6 +1,6 @@
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
-from langchain.chains import LLMChain
+from langchain.chains import SomeOtherClass
 from config import OPENAI_API_KEY
 
 
@@ -15,10 +15,10 @@ class QuestionGenerator:
             "Generate a thought-provoking question about the book titled '{book_title}' "
             "which is about {book_summary}. The question should encourage critical thinking."
         )
-        self.chain = LLMChain(llm=self.llm, prompt=self.prompt)
+        self.chain = SomeOtherClass(self.prompt, self.llm)
 
     def generate_question(self, book):
-        return self.chain.run(
+        return self.chain.invoke(
             book_title=book['title'],
             book_summary=book['summary']
         ).strip()

@@ -1,7 +1,7 @@
 from models import db, Book
-from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
-from langchain.chains import LLMChain
+from langchain_openai import ChatOpenAI
 from config import OPENAI_API_KEY
 
 
@@ -30,9 +30,9 @@ class UniversalBookRepository:
         return book.to_dict() if book else None
 
     def generate_book_summary(self, book):
-        template = PromptTemplate(
+        template = ChatPromptTemplate(
             input_variables=["title", "author", "summary"],
             template="Summarize the book '{title}' by {author}: {summary}"
         )
-        chain = LLMChain(llm=self.llm, prompt=template)
-        return chain.run(title=book['title'], author=book['author'], summary=book['summary'])
+        self.chain = template | self.llm
+        return self.chain.invoke(title=book['title'], author=book['author'], summary=book['summary'])
