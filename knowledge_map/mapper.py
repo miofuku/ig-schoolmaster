@@ -1,5 +1,5 @@
 from datetime import datetime
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.chains import LLMChain
 from config import OPENAI_API_KEY
@@ -8,6 +8,7 @@ from config import OPENAI_API_KEY
 class KnowledgeMapper:
     def __init__(self):
         self.maps = {}  # user_id: list of maps
+        self.knowledge_base = []  # Store extracted knowledge from documents
         self.llm = ChatOpenAI(
             temperature=0.7,
             openai_api_key=OPENAI_API_KEY,
@@ -114,6 +115,17 @@ class KnowledgeMapper:
             map_data['updated_at'] = datetime.now()
             return True
         return False
+
+    def add_to_knowledge_base(self, text):
+        self.knowledge_base.append(text)
+
+    def generate_questions_from_knowledge(self, topic):
+        prompt = ChatPromptTemplate.from_template(
+            "Generate a thought-provoking question about the topic '{topic}' based on the following knowledge: {knowledge}"
+        )
+        knowledge_text = " ".join(self.knowledge_base)  # Combine all knowledge for context
+        chain = LLMChain(llm=self.llm, prompt=prompt)
+        return chain.run(topic=topic, knowledge=knowledge_text).strip()
 
 # Example usage:
 # mapper = KnowledgeMapper()

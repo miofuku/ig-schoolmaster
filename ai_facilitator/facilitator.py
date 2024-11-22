@@ -1,9 +1,10 @@
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.chains import LLMChain
 from collections import defaultdict
 import random
 from config import OPENAI_API_KEY
+from knowledge_map.mapper import KnowledgeMapper
 
 
 class AIFacilitator:
@@ -15,6 +16,7 @@ class AIFacilitator:
         )
         self.context_prompts = defaultdict(list)
         self.initialize_context_prompts()
+        self.knowledge_mapper = KnowledgeMapper()
 
     def initialize_context_prompts(self):
         self.context_prompts['reading'] = [
@@ -41,15 +43,8 @@ class AIFacilitator:
         if not isinstance(book, dict) or 'title' not in book or 'author' not in book:
             raise ValueError("Invalid book data provided")
 
-        prompt = ChatPromptTemplate.from_template(
-            "Generate a thought-provoking question about the book '{title}' by {author}. "
-            "The question should encourage critical thinking and personal reflection."
-        )
-
-        chain = LLMChain(llm=self.llm, prompt=prompt)
-        
-        response = chain.run(title=book['title'], author=book['author'])
-        return response.strip()
+        # Generate questions based on the knowledge base
+        return self.knowledge_mapper.generate_questions_from_knowledge(book['title'])
 
     def generate_reflection_prompt(self, topic):
         prompt = ChatPromptTemplate.from_template(

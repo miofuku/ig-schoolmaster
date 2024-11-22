@@ -3,6 +3,11 @@
 {% block content %}
     <h2>Explore Books</h2>
 
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" id="file-input" accept=".pdf,.txt" required>
+        <button type="submit">Upload Document</button>
+    </form>
+
     <div class="book-list">
         {% for book in books %}
             <div class="book-item">
@@ -11,7 +16,7 @@
                 <p>{{ book.summary }}</p>
                 <p>Tags: {{ book.tags|join(', ') }}</p>
                 <div class="book-actions">
-                    <button onclick="generateQuestion({{ book.id }})">Generate Question</button>
+                    <button type="button" onclick="generateQuestion('{{ book.id }}')">Generate Question</button>
                     <a href="{{ url_for('discuss_book', book_id=book.id) }}" class="button">Join Discussion</a>
                 </div>
                 <div id="question-{{ book.id }}" class="question-container" style="display: none;"></div>
@@ -21,19 +26,29 @@
 
     <script>
     function generateQuestion(bookId) {
-        fetch('/question', {
+        fetch(`/generate_question/${bookId}`)
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById(`question-${bookId}`);
+                container.textContent = data.question;
+                container.style.display = 'block';
+            });
+    }
+
+    document.getElementById('upload-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fileInput = document.getElementById('file-input');
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        fetch('/upload_document', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({book_id: bookId}),
+            body: formData,
         })
         .then(response => response.json())
         .then(data => {
-            if (data.question) {
-                const questionContainer = document.getElementById(`question-${bookId}`);
-                questionContainer.innerHTML = `<p><strong>Thought-provoking question:</strong> ${data.question}</p>`;
-                questionContainer.style.display = 'block';
+            if (data.success) {
+                alert('Document uploaded successfully!');
             } else {
                 console.error('Error:', data.error);
             }
@@ -41,6 +56,6 @@
         .catch((error) => {
             console.error('Error:', error);
         });
-    }
+    });
     </script>
 {% endblock %}

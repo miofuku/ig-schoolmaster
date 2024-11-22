@@ -7,7 +7,17 @@ from ai_facilitator.facilitator import AIFacilitator
 from knowledge_map.mapper import KnowledgeMapper
 from models import db
 from models import Book
+import os
+from werkzeug.utils import secure_filename
 
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'pdf', 'txt'}
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def create_app():
     app = Flask(__name__, template_folder='templates')
@@ -80,7 +90,6 @@ def get_question():
         return jsonify({'error': 'Book not found'}), 404
 
     try:
-        # Ensure book is a dictionary with required keys
         if isinstance(book, dict) and 'title' in book and 'author' in book:
             question = ai_facilitator.generate_explore_questions(book)
             return jsonify({'question': question})
@@ -271,6 +280,28 @@ def delete_edge():
     edge_id = request.json['edge_id']
     success = knowledge_mapper.delete_edge(user_id, map_id, edge_id)
     return jsonify({'success': success})
+
+
+@app.route('/upload_document', methods=['POST'])
+def upload_document():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        # Process the document and extract text for knowledge base
+        process_document(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return jsonify({'success': True}), 200
+    return jsonify({'error': 'File type not allowed'}), 400
+
+
+def process_document(file_path):
+    # Implement logic to extract text from PDF or TXT files
+    # Store the extracted text in a knowledge base (e.g., database or in-memory)
+    pass
 
 
 if __name__ == '__main__':
