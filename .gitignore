@@ -3,3 +3,5 @@ venv/
 */__pycache*
 __pycache*
 instance/
+.env
+

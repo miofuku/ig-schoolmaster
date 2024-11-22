@@ -1,12 +1,18 @@
-import random
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import LLMChain
 from collections import defaultdict
-from langchain import OpenAI, LLMChain
-from langchain.prompts import PromptTemplate
+import random
+from config import OPENAI_API_KEY
 
 
 class AIFacilitator:
     def __init__(self):
-        self.llm = OpenAI(temperature=0.7)
+        self.llm = ChatOpenAI(
+            temperature=0.7,
+            openai_api_key=OPENAI_API_KEY,
+            model_name="gpt-3.5-turbo"
+        )
         self.context_prompts = defaultdict(list)
         self.initialize_context_prompts()
 
@@ -35,22 +41,21 @@ class AIFacilitator:
         if not isinstance(book, dict) or 'title' not in book or 'author' not in book:
             raise ValueError("Invalid book data provided")
 
-        rule_based_prompt = random.choice([
-            f"How does the theme of '{book['title']}' relate to contemporary issues?",
-            f"What questions would you ask the author of '{book['title']}' if you had the chance?",
-            f"How might the ideas in '{book['title']}' challenge your existing beliefs?",
-            f"What connections can you draw between '{book['title']}' and other books you've read?",
-            f"How could the concepts in '{book['title']}' be applied to solve real-world problems?"
-        ])
-        
-        lm_prompt = self.generate_lm_prompt(f"the book '{book['title']}' by {book['author']}")
-        return f"{rule_based_prompt} Additionally, {lm_prompt}"
-
-    def generate_lm_prompt(self, context):
-        template = PromptTemplate(
-            input_variables=["context"],
-            template="Generate a thought-provoking question about {context}:"
+        prompt = ChatPromptTemplate.from_template(
+            "Generate a thought-provoking question about the book '{title}' by {author}. "
+            "The question should encourage critical thinking and personal reflection."
         )
-        chain = LLMChain(llm=self.llm, prompt=template)
-        return chain.run(context=context)
+
+        chain = LLMChain(llm=self.llm, prompt=prompt)
+        
+        response = chain.run(title=book['title'], author=book['author'])
+        return response.strip()
+
+    def generate_reflection_prompt(self, topic):
+        prompt = ChatPromptTemplate.from_template(
+            "Generate a reflective question about {topic} that encourages deep personal insight and critical thinking."
+        )
+        
+        chain = LLMChain(llm=self.llm, prompt=prompt)
+        return chain.run(topic=topic).strip()
 

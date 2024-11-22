@@ -1,12 +1,18 @@
 from datetime import datetime
-from langchain import OpenAI, LLMChain
-from langchain.prompts import PromptTemplate
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import LLMChain
+from config import OPENAI_API_KEY
 
 
 class KnowledgeMapper:
     def __init__(self):
         self.maps = {}  # user_id: list of maps
-        self.llm = OpenAI(temperature=0.7)
+        self.llm = ChatOpenAI(
+            temperature=0.7,
+            openai_api_key=OPENAI_API_KEY,
+            model_name="gpt-3.5-turbo"
+        )
 
     def create_map(self, user_id, title):
         if user_id not in self.maps:
@@ -23,12 +29,13 @@ class KnowledgeMapper:
         return new_map['id']
 
     def generate_insight(self, topic):
-        template = PromptTemplate(
-            input_variables=["topic"],
-            template="What are the key concepts and connections related to {topic}?"
+        prompt = ChatPromptTemplate.from_template(
+            "What are the key concepts and connections related to {topic}? "
+            "Please provide a concise analysis."
         )
-        chain = LLMChain(llm=self.llm, prompt=template)
-        return chain.run(topic=topic)
+        
+        chain = LLMChain(llm=self.llm, prompt=prompt)
+        return chain.run(topic=topic).strip()
 
     def add_node(self, user_id, map_id, label, x, y):
         map_data = self.get_map(user_id, map_id)

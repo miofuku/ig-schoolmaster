@@ -1,11 +1,17 @@
 from models import db, Book
-from langchain import OpenAI, LLMChain
-from langchain.prompts import PromptTemplate
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import LLMChain
+from config import OPENAI_API_KEY
 
 
 class UniversalBookRepository:
     def __init__(self):
-        self.llm = OpenAI(temperature=0.7)
+        self.llm = ChatOpenAI(
+            temperature=0.7,
+            openai_api_key=OPENAI_API_KEY,
+            model_name="gpt-3.5-turbo"
+        )
 
     def get_random_books(self, n):
         return [book.to_dict() for book in Book.query.order_by(db.func.random()).limit(n).all()]
