@@ -10,4 +10,5 @@ Flask-SQLAlchemy==3.0.3
 Flask-Login==0.6.3
 transformers==4.29.2
 torch==1.13.1
-langchain==0.0.200
+langchain==0.3.7 
+pydantic==2.7.4
