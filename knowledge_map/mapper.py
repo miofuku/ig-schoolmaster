@@ -1,9 +1,12 @@
 from datetime import datetime
+from langchain import OpenAI, LLMChain
+from langchain.prompts import PromptTemplate
 
 
 class KnowledgeMapper:
     def __init__(self):
         self.maps = {}  # user_id: list of maps
+        self.llm = OpenAI(temperature=0.7)
 
     def create_map(self, user_id, title):
         if user_id not in self.maps:
@@ -18,6 +21,14 @@ class KnowledgeMapper:
         }
         self.maps[user_id].append(new_map)
         return new_map['id']
+
+    def generate_insight(self, topic):
+        template = PromptTemplate(
+            input_variables=["topic"],
+            template="What are the key concepts and connections related to {topic}?"
+        )
+        chain = LLMChain(llm=self.llm, prompt=template)
+        return chain.run(topic=topic)
 
     def add_node(self, user_id, map_id, label, x, y):
         map_data = self.get_map(user_id, map_id)
