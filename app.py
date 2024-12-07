@@ -3,7 +3,7 @@ from universal_book.repository import UniversalBookRepository, Book
 from question_generator.generator import QuestionGenerator
 from peer_platform.collaboration import PeerCollaborationPlatform
 from progress_tracker.tracker import ProgressTracker
-from ai_facilitator.facilitator import AIFacilitator
+from facilitator import AIFacilitator
 from knowledge_map.mapper import KnowledgeMapper
 from models import db
 from models import Book
