@@ -1,28 +1,26 @@
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 
-class KnowledgeAssessmentChain(LLMChain):
+class KnowledgeAssessmentChain:
     def __init__(self, llm):
-        prompt = PromptTemplate(
+        self.llm = llm
+        self.assessment_prompt = PromptTemplate(
             input_variables=["knowledge_area", "difficulty", "optional_material", "assessment_type"],
             template="""
-            Generate an assessment for the following knowledge area:
-            Knowledge Area: {knowledge_area}
-            Difficulty Level: {difficulty}
-            Additional Material Context: {optional_material}
-            Assessment Type: {assessment_type}
+            Generate a {assessment_type} assessment for {knowledge_area} at {difficulty} level.
             
-            Consider:
-            1. Core concepts in the specified area
-            2. Real-world applications
-            3. Common misconceptions
-            4. Interdisciplinary connections
+            Context Material: {optional_material}
             
-            Generate:
-            1. Conceptual questions
-            2. Application scenarios
-            3. Critical thinking challenges
-            4. Self-reflection prompts
+            Create an assessment that:
+            1. Tests key concepts and understanding
+            2. Includes a mix of question types
+            3. Focuses on practical application
+            4. Provides clear evaluation criteria
+            
+            Assessment:
             """
         )
-        super().__init__(llm=llm, prompt=prompt) 
+        self.chain = LLMChain(llm=llm, prompt=self.assessment_prompt)
+    
+    async def arun(self, inputs):
+        return await self.chain.arun(inputs) 

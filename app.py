@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session
 from models import db, Book
+from PyPDF2 import PdfReader
 import os
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
@@ -7,6 +8,7 @@ from langchain_openai import ChatOpenAI
 from chains.assessment_chain import ConceptVerificationChain
 from chains.gap_analysis_chain import KnowledgeGapChain
 from agents.verification_agent import LearningVerificationAgent
+from chains.knowledge_assessment_chain import KnowledgeAssessmentChain
 
 # Load environment variables
 load_dotenv()
@@ -16,6 +18,15 @@ ALLOWED_EXTENSIONS = {'pdf', 'txt'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def process_material(file):
+    """Process uploaded file and extract text content."""
+    if file.filename.endswith('.txt'):
+        return file.read().decode('utf-8')
+    elif file.filename.endswith('.pdf'):
+        reader = PdfReader(file)
+        return ' '.join(page.extract_text() for page in reader.pages)
+    return ""
 
 def create_app():
     app = Flask(__name__, template_folder='templates')
@@ -36,11 +47,13 @@ def create_app():
 
     verification_chains = {
         "concept_verification": ConceptVerificationChain(llm),
-        "knowledge_gap": KnowledgeGapChain(llm)
+        "knowledge_gap": KnowledgeGapChain(llm),
+        "knowledge_assessment": KnowledgeAssessmentChain(llm)
     }
     
     # Initialize verification agent
     app.verification_agent = LearningVerificationAgent(llm, verification_chains)
+    app.knowledge_assessment_chain = verification_chains["knowledge_assessment"]
 
     with app.app_context():
         db.create_all()
