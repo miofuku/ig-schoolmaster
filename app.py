@@ -80,6 +80,37 @@ async def analyze_progress():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/generate-assessment', methods=['POST'])
+async def generate_assessment():
+    try:
+        data = request.json
+        knowledge_area = data['knowledge_area']
+        difficulty = data.get('difficulty', 'intermediate')
+        
+        # Handle optional material upload
+        material_context = ""
+        if 'material' in request.files:
+            file = request.files['material']
+            if file and allowed_file(file.filename):
+                # Process uploaded material
+                material_context = process_material(file)
+        
+        assessment = await app.knowledge_assessment_chain.arun({
+            "knowledge_area": knowledge_area,
+            "difficulty": difficulty,
+            "optional_material": material_context,
+            "assessment_type": data.get('assessment_type', 'comprehensive')
+        })
+        
+        return jsonify({
+            'success': True,
+            'assessment': assessment,
+            'knowledge_area': knowledge_area,
+            'difficulty': difficulty
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # Web Routes
 @app.route('/')
 def index():
