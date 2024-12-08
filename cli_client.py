@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from chains.knowledge_assessment_chain import KnowledgeAssessmentChain
+from chains.misconception_chain import MisconceptionDetectionChain
+from chains.depth_analysis_chain import KnowledgeDepthChain
 from agents.verification_agent import LearningVerificationAgent
 from curriculum.context_manager import CurriculumContext
 
@@ -18,6 +20,8 @@ class LearningCLI:
         )
         
         verification_chains = {
+            "misconception_detection": MisconceptionDetectionChain(llm),
+            "depth_analysis": KnowledgeDepthChain(llm),
             "knowledge_assessment": KnowledgeAssessmentChain(llm)
         }
         
@@ -92,6 +96,28 @@ class LearningCLI:
         
         print("\nGenerated Assessment:")
         print(result)
+    
+    async def view_progress(self):
+        print("\n=== Learning Progress Analysis ===")
+        subject = input("Enter subject name: ")
+        
+        # Get all verifications for the subject
+        subject_context = self.context_manager.get_subject_context(subject)
+        
+        # Analyze trends
+        trend_analysis = await self.agent.analyze_learning_trends(subject_context)
+        
+        print("\nLearning Trends:")
+        print("Understanding Progression:")
+        print(trend_analysis["trend_analysis"]["understanding_progression"])
+        print("\nPersistent Misconceptions:")
+        print(trend_analysis["trend_analysis"]["persistent_misconceptions"])
+        print("\nDepth Development:")
+        print(trend_analysis["trend_analysis"]["depth_development"])
+        print("\nRecommendations:")
+        print(trend_analysis["trend_analysis"]["recommendations"])
+        print("\nAI Insights:")
+        print(trend_analysis["ai_insights"])
 
 def main():
     cli = LearningCLI()

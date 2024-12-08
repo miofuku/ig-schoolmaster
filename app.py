@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from agents.verification_agent import LearningVerificationAgent
 from chains.knowledge_assessment_chain import KnowledgeAssessmentChain
+from chains.misconception_chain import MisconceptionDetectionChain
+from chains.depth_analysis_chain import KnowledgeDepthChain
 
 # Load environment variables
 load_dotenv()
@@ -37,6 +39,8 @@ def create_app():
     )
 
     verification_chains = {
+        "misconception_detection": MisconceptionDetectionChain(llm),
+        "depth_analysis": KnowledgeDepthChain(llm),
         "knowledge_assessment": KnowledgeAssessmentChain(llm)
     }
     
@@ -110,6 +114,23 @@ async def generate_assessment():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/analyze-trends', methods=['POST'])
+async def analyze_trends():
+    try:
+        data = request.json
+        if not data or 'subject' not in data:
+            return jsonify({'error': 'Missing required fields'}), 400
+        
+        subject_context = app.context_manager.get_subject_context(data['subject'])
+        trend_analysis = await app.verification_agent.analyze_learning_trends(subject_context)
+        
+        return jsonify({
+            'success': True,
+            'trends': trend_analysis
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # Web Routes
 @app.route('/')
 def index():
@@ -122,6 +143,10 @@ def dashboard():
 @app.route('/assessment')
 def assessment():
     return render_template('assessment.html')
+
+@app.route('/trends')
+def trends_dashboard():
+    return render_template('trends.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
