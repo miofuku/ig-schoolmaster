@@ -2,11 +2,8 @@ from flask import Flask, render_template, request, jsonify, session
 from models import db, Book
 from PyPDF2 import PdfReader
 import os
-from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from chains.assessment_chain import ConceptVerificationChain
-from chains.gap_analysis_chain import KnowledgeGapChain
 from agents.verification_agent import LearningVerificationAgent
 from chains.knowledge_assessment_chain import KnowledgeAssessmentChain
 
@@ -46,8 +43,6 @@ def create_app():
     )
 
     verification_chains = {
-        "concept_verification": ConceptVerificationChain(llm),
-        "knowledge_gap": KnowledgeGapChain(llm),
         "knowledge_assessment": KnowledgeAssessmentChain(llm)
     }
     

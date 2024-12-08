@@ -1,0 +1,18 @@
+{
+  "subjects": {
+    "biology": {
+      "topics": [
+        "cell",
+        "animal"
+      ],
+      "key_points": {
+        "cell": [
+          "cell structure"
+        ]
+      },
+      "progress": {}
+    }
+  },
+  "learning_progress": {},
+  "assessment_history": []
+}
