@@ -7,17 +7,18 @@ class KnowledgeAssessmentChain:
         self.assessment_prompt = PromptTemplate(
             input_variables=["knowledge_area", "difficulty", "optional_material", "assessment_type"],
             template="""
-            Generate a {assessment_type} assessment for {knowledge_area} at {difficulty} level.
+            Generate a {difficulty}-level assessment for {knowledge_area}.
+            Type: {assessment_type}
+            Additional Material: {optional_material}
             
-            Context Material: {optional_material}
+            Structure the assessment with:
+            1. Multiple Choice Questions (3-4 questions)
+            2. True/False Questions (2-3 statements)
+            3. Short Answer Questions (1-2 questions)
+            4. Practical Application Task
             
-            Create an assessment that:
-            1. Tests key concepts and understanding
-            2. Includes a mix of question types
-            3. Focuses on practical application
-            4. Provides clear evaluation criteria
-            
-            Assessment:
+            Include clear evaluation criteria at the end.
+            Format the response in a clean, readable way.
             """
         )
         self.chain = RunnableSequence(
@@ -26,4 +27,6 @@ class KnowledgeAssessmentChain:
         )
     
     async def arun(self, inputs):
-        return await self.chain.ainvoke(inputs) 
+        result = await self.chain.ainvoke(inputs)
+        # Ensure we return just the content string
+        return result.content if hasattr(result, 'content') else str(result) 
