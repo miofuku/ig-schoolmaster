@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, jsonify, session
-from models import db, Book
 from PyPDF2 import PdfReader
 import os
 from dotenv import load_dotenv
@@ -27,13 +26,8 @@ def process_material(file):
 
 def create_app():
     app = Flask(__name__, template_folder='templates')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///learning_verification.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.secret_key = os.getenv('SECRET_KEY', 'default-secret-key')
-
-    # Initialize database
-    db.init_app(app)
 
     # Initialize LLM and chains
     llm = ChatOpenAI(
@@ -49,9 +43,6 @@ def create_app():
     # Initialize verification agent
     app.verification_agent = LearningVerificationAgent(llm, verification_chains)
     app.knowledge_assessment_chain = verification_chains["knowledge_assessment"]
-
-    with app.app_context():
-        db.create_all()
 
     return app
 
