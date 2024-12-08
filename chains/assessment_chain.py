@@ -1,19 +1,29 @@
-from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
+from langchain_core.runnables import RunnableSequence
 
-class ConceptVerificationChain(LLMChain):
+class ConceptVerificationChain:
     def __init__(self, llm):
-        prompt = PromptTemplate(
-            input_variables=["student_response", "concept"],
+        self.llm = llm
+        self.verification_prompt = PromptTemplate(
+            input_variables=["concept", "response"],
             template="""
-            Evaluate the student's understanding of {concept} based on their response:
+            Evaluate the understanding of the following concept:
             
-            Student Response: {student_response}
+            Concept: {concept}
+            Student's Response: {response}
             
-            Provide an analysis covering:
-            1. Accuracy of understanding
-            2. Identification of misconceptions
+            Provide:
+            1. Accuracy assessment
+            2. Missing key points
             3. Suggestions for improvement
+            
+            Evaluation:
             """
         )
-        super().__init__(llm=llm, prompt=prompt) 
+        self.chain = RunnableSequence(
+            first=self.verification_prompt,
+            last=self.llm
+        )
+    
+    async def arun(self, inputs):
+        return await self.chain.ainvoke(inputs) 

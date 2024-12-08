@@ -41,7 +41,7 @@ def create_app():
     # Initialize LLM and chains
     llm = ChatOpenAI(
         api_key=os.getenv('OPENAI_API_KEY'),
-        model="gpt-4-turbo-preview",
+        model="gpt-3.5-turbo",
         temperature=0.7
     )
 

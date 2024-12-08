@@ -1,5 +1,5 @@
-from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
+from langchain_core.runnables import RunnableSequence
 
 class KnowledgeAssessmentChain:
     def __init__(self, llm):
@@ -20,7 +20,10 @@ class KnowledgeAssessmentChain:
             Assessment:
             """
         )
-        self.chain = LLMChain(llm=llm, prompt=self.assessment_prompt)
+        self.chain = RunnableSequence(
+            first=self.assessment_prompt,
+            last=self.llm
+        )
     
     async def arun(self, inputs):
-        return await self.chain.arun(inputs) 
+        return await self.chain.ainvoke(inputs) 
